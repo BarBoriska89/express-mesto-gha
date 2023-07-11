@@ -56,7 +56,7 @@ const deleteCard = (req, res) => {
         return;
       } else
       {
-      res.status(INTERNAL_SERVER).send({ message: 'Ошибка по умолчанию.' });
+      res.status(NOT_FOUND).send({ message: 'Ошибка по умолчанию.' });
       }
     })
 };
