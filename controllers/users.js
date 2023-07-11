@@ -39,15 +39,16 @@ const getUser = (req, res) => {
   const { userId } = req.params;
   User.findById(userId)
     .then((user) => {
-      if (!user) {
-        res.status(NOT_FOUND).send({ message: `Пользователь по указанному _id ${userId} не найден. ` });
-        return;
-      }
+      //if (!user) {
+      //  res.status(NOT_FOUND).send({ message: `Пользователь по указанному _id ${userId} не найден. ` });
+//return;
+   //   }
       res.send(user);
     })
     .catch((err) => {
+      console.log(err.name);
       if (err.name === 'CastError') {
-        res.status(NOT_FOUND).send({ message: `Пользователь по указанному _id ${userId} не найден. ` });
+        res.status(BAD_REQUEST).send({ message: `Пользователь по указанному _id ${userId} не найден. ` });
         return;
       } else {
       res.status(INTERNAL_SERVER).send({ message: 'Ошибка по умолчанию.' });

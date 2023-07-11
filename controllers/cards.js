@@ -41,16 +41,21 @@ const deleteCard = (req, res) => {
         res.status(INTERNAL_SERVER).send({ message: 'Вы не можете удалить чужую карточку.' });
       }
       console.log(card);
-      if(!card) {
-        res.status(NOT_FOUND).send({ message: `Карточка с указанным _id ${cardId} не найдена. ` });
-      }
+     // if(!card) {
+    //    res.status(NOT_FOUND).send({ message: `Карточка с указанным _id ${cardId} не найдена. ` });
+    //  }
       res.send({ message: 'Карточка удалена.' });
     })
     .catch((err) => {
+      console.log(err.name);
       if (err.name === 'CastError') {
-        res.status(NOT_FOUND).send({ message: `Карточка с указанным _id ${cardId} не найдена. ` });
+        res.status(BAD_REQUEST).send({ message: `Карточка с указанным _id ${cardId} не найдена. ` });
         return;
-      } else {
+      } else if (err.name === 'ValidationError') {
+        res.status(BAD_REQUEST).send({ message: `Карточка с указанным _id ${cardId} не найдена. ` });
+        return;
+      } else
+      {
       res.status(INTERNAL_SERVER).send({ message: 'Ошибка по умолчанию.' });
       }
     })
