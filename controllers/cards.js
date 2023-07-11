@@ -41,9 +41,9 @@ const deleteCard = (req, res) => {
         res.status(INTERNAL_SERVER).send({ message: 'Вы не можете удалить чужую карточку.' });
       }
       console.log(card);
-     // if(!card) {
-    //    res.status(NOT_FOUND).send({ message: `Карточка с указанным _id ${cardId} не найдена. ` });
-    //  }
+     if(!card) {
+        res.status(NOT_FOUND).send({ message: `Карточка с указанным _id ${cardId} не найдена. ` });
+     }
       res.send({ message: 'Карточка удалена.' });
     })
     .catch((err) => {
