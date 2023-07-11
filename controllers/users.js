@@ -1,5 +1,7 @@
-const {BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER} = require('../constants');
 const User = require('../models/user');
+const BAD_REQUEST = 400;
+const NOT_FOUND = 404;
+const INTERNAL_SERVER = 500;
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
@@ -37,6 +39,10 @@ const getUser = (req, res) => {
   const { userId } = req.params;
   User.findById(userId)
     .then((user) => {
+      if (!user) {
+        res.status(NOT_FOUND).send({ message: `Пользователь по указанному _id ${userId} не найден. ` });
+        return;
+      }
       res.send(user);
     })
     .catch((err) => {
@@ -56,7 +62,7 @@ const updateUser = (req, res) => {
   User.findByIdAndUpdate(userId, { name, about }, { runValidators: true, new: true })
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: `Пользователь по указанному _id ${userId} не найден. ` });
+        res.status(NOT_FOUND).send({ message: `Пользователь по указанному _id ${userId} не найден. ` });
         return;
       }
       res.send(user);
@@ -83,6 +89,7 @@ const updateAvatar = (req, res) => {
       res.send(user);
     })
     .catch((err) => {
+      console.log(err.name);
       if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
         return;

@@ -1,5 +1,7 @@
 const Card = require('../models/card');
-const {BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER} = require('../constants');
+const BAD_REQUEST = 400;
+const NOT_FOUND = 404;
+const INTERNAL_SERVER = 500;
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
@@ -38,7 +40,11 @@ const deleteCard = (req, res) => {
       if (card.owner._id != req.user._id) {
         res.status(INTERNAL_SERVER).send({ message: 'Вы не можете удалить чужую карточку.' });
       }
-      res.send({ data: card })
+      console.log(card);
+      if(!card) {
+        res.status(NOT_FOUND).send({ message: `Карточка с указанным _id ${cardId} не найдена. ` });
+      }
+      res.send({ message: 'Карточка удалена.' });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
