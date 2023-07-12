@@ -1,4 +1,6 @@
+const mongoose = require('mongoose');
 const Card = require('../models/card');
+
 const BAD_REQUEST = 400;
 const NOT_FOUND = 404;
 const INTERNAL_SERVER = 500;
@@ -12,24 +14,22 @@ const createCard = (req, res) => {
       res.send(card);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err instanceof mongoose.Error.ValidationError) {
         res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании карточки.' });
         return;
-      } else {
-      res.status(INTERNAL_SERVER).send({ message: 'Ошибка по умолчанию.' });
       }
-    })
+      res.status(INTERNAL_SERVER).send({ message: 'Ошибка по умолчанию.' });
+    });
 };
 
 const getCards = (req, res) => {
-
   Card.find({})
     .then((cards) => {
       res.send(cards);
     })
     .catch(() => {
       res.status(INTERNAL_SERVER).send({ message: 'Ошибка по умолчанию.' });
-    })
+    });
 };
 
 const deleteCard = (req, res) => {
@@ -37,37 +37,33 @@ const deleteCard = (req, res) => {
 
   Card.findByIdAndRemove(cardId)
     .then((card) => {
-      if (card.owner._id != req.user._id) {
+      if (card.owner._id !== req.user._id) {
         res.status(INTERNAL_SERVER).send({ message: 'Вы не можете удалить чужую карточку.' });
+        return;
       }
       console.log(card);
-     if(!card) {
+      if (!card) {
         res.status(NOT_FOUND).send({ message: `Карточка с указанным _id ${cardId} не найдена. ` });
-     }
+      }
       res.send({ message: 'Карточка удалена.' });
     })
     .catch((err) => {
       console.log(err.name);
-      if (err.name === 'CastError') {
+      if (err instanceof mongoose.Error.CastError) {
         res.status(BAD_REQUEST).send({ message: `Карточка с указанным _id ${cardId} не найдена. ` });
         return;
-      } else if (err.name === 'ValidationError') {
-        res.status(NOT_FOUND).send({ message: `Карточка с указанным _id ${cardId} не найдена. ` });
-        return;
-      } else
-      {
-      res.status(NOT_FOUND).send({ message: 'Ошибка по умолчанию.' });
       }
-    })
+      res.status(NOT_FOUND).send({ message: 'Ошибка по умолчанию.' });
+    });
 };
 
 const likeCard = (req, res) => {
-  const cardId = req.params.cardId;
+  const { cardId } = req.params.cardId;
 
   Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: req.user._id } },
-    { runValidators: true, new: true },
+    { new: true },
   )
     .then((card) => {
       if (!card) {
@@ -77,22 +73,21 @@ const likeCard = (req, res) => {
       res.send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: `Переданы некорректные данные для постановки/снятия лайка. ` });
+      if (err instanceof mongoose.Error.CastError) {
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные для постановки/снятия лайка. ' });
         return;
-      } else {
-      res.status(INTERNAL_SERVER).send({ message: 'Ошибка по умолчанию.' });
       }
-    })
+      res.status(INTERNAL_SERVER).send({ message: 'Ошибка по умолчанию.' });
+    });
 };
 
 const dislikeCard = (req, res) => {
-  const cardId = req.params.cardId;
+  const { cardId } = req.params.cardId;
 
   Card.findByIdAndUpdate(
     cardId,
     { $pull: { likes: req.user._id } },
-    { runValidators: true, new: true },
+    { new: true },
   )
     .then((card) => {
       if (!card) {
@@ -102,15 +97,14 @@ const dislikeCard = (req, res) => {
       res.send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: `Переданы некорректные данные для постановки/снятии лайка. ` });
+      if (err instanceof mongoose.Error.CastError) {
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
         return;
-      } else {
-      res.status(INTERNAL_SERVER).send({ message: 'Ошибка по умолчанию.' });
       }
-    })
+      res.status(INTERNAL_SERVER).send({ message: 'Ошибка по умолчанию.' });
+    });
 };
 
 module.exports = {
-  createCard, getCards, deleteCard, likeCard, dislikeCard
+  createCard, getCards, deleteCard, likeCard, dislikeCard,
 };

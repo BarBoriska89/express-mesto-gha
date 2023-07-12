@@ -3,24 +3,31 @@
     "browser": true,
     "node": true,
     "es2021": true
-},
-"extends": [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:react/jsx-runtime"
-],
-
-"parserOptions": {
-  "ecmaFeatures": {
-    "jsx": true
   },
+  "extends": [
+    "airbnb-base"
+    //"eslint:recommended"
+   // "plugin:react/recommended",
+   // "plugin:react/jsx-runtime"
+  ],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
     "ecmaVersion": "latest",
     "sourceType": "module"
-},
-
-"plugins": [
+  },
+  "plugins": [
     "react"
-],
-"rules": {
-}
+  ],
+  "rules": {
+    "no-underscore-dangle": [
+      "error",
+      {
+        "allow": [
+          "_id"
+        ]
+      }
+    ]
+  }
 }
