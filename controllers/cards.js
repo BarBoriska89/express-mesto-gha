@@ -37,13 +37,9 @@ const deleteCard = (req, res) => {
 
   Card.findByIdAndRemove(cardId)
     .then((card) => {
-      if (card.owner._id !== req.user._id) {
-        res.status(INTERNAL_SERVER).send({ message: 'Вы не можете удалить чужую карточку.' });
-        return;
-      }
-      console.log(card);
       if (!card) {
         res.status(NOT_FOUND).send({ message: `Карточка с указанным _id ${cardId} не найдена. ` });
+        return;
       }
       res.send({ message: 'Карточка удалена.' });
     })
@@ -58,8 +54,8 @@ const deleteCard = (req, res) => {
 };
 
 const likeCard = (req, res) => {
-  const { cardId } = req.params.cardId;
-
+  const { cardId } = req.params;
+  console.log(cardId);
   Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: req.user._id } },
@@ -82,7 +78,7 @@ const likeCard = (req, res) => {
 };
 
 const dislikeCard = (req, res) => {
-  const { cardId } = req.params.cardId;
+  const { cardId } = req.params;
 
   Card.findByIdAndUpdate(
     cardId,
