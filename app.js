@@ -21,6 +21,7 @@ app.use(bodyParser.json());
 
 app.post('/signin', loginValidation, login);
 app.post('/signup', createUserValidation, createUser);
+
 app.use(auth);
 app.use(router);
 app.use(errors());

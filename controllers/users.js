@@ -16,10 +16,11 @@ const createUser = (req, res, next) => {
   } = req.body;
 
   if (!email || !password) {
-    throw new BadRequest('Переданы некорректные данные при создании пользователя.');
+    next(new BadRequest('Переданы некорректные данные при создании пользователя.'));
+    return;
   }
 
-  return User.findOne({ email })
+  User.findOne({ email })
     .then((user) => {
       if (user) {
         throw new ConflictError('Пользователь с таким Email уже создан.');
@@ -35,7 +36,7 @@ const createUser = (req, res, next) => {
         })
         .catch((err) => {
           if (err instanceof mongoose.Error.ValidationError) {
-            next(new BadRequest('Переданы некорректные данные при создании пользователя.'));
+            next(new BadRequest(err.message));
             return;
           }
           next(err);
