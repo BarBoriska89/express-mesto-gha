@@ -28,10 +28,10 @@ const createUser = (req, res, next) => {
 
       return bcrypt.hash(password, SALT_ROUNDS)
         .then((hash) => User.create({
-          name, about, avatar, email, hash,
+          name, about, avatar, email, password: hash,
         }))
         .then((newUser) => {
-          res.send(newUser);
+          res.send({ message: `Пользователь ${email} успешно зарегистрирован` });
           console.log(newUser);
         })
         .catch((err) => {
