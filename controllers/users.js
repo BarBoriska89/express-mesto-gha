@@ -31,7 +31,7 @@ const createUser = (req, res, next) => {
           name, about, avatar, email, password: hash,
         }))
         .then((newUser) => {
-          res.send(`Пользователь ${email} успешно зарегистрирован`);
+          res.send(newUser);
           console.log(newUser);
         })
         .catch((err) => {

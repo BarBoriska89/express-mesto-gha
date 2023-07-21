@@ -2,6 +2,8 @@ const { celebrate, Joi } = require('celebrate');
 const validator = require('validator');
 const BadRequest = require('../errors/BadRequest');
 
+const regex = /^((http|https):\/\/)?(www\.)?([A-Za-z0-9]{1}[A-Za-z0-9-]*\.?)*\.{1}[A-Za-z0-9-]{2,8}(\/([\w#!:.?+=&%@!\-/])*)?/;
+
 const urlValidation = (url) => {
   if (validator.isURL(url, { require_tld: false })) return url;
   throw new BadRequest('Некорректный формат ссылки');
@@ -12,7 +14,7 @@ const createUserValidation = celebrate({
     email: Joi.string().required().email(),
     password: Joi.string().min(8).required(),
     name: Joi.string().min(2).max(30),
-    avatar: Joi.string().custom(urlValidation),
+    avatar: Joi.string().pattern(regex),
     about: Joi.string().min(2).max(30),
   }),
 });
