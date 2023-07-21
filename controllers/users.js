@@ -28,7 +28,7 @@ const createUser = (req, res, next) => {
 
       return bcrypt.hash(password, SALT_ROUNDS)
         .then((hash) => User.create({
-          name, about, avatar, email, password: hash,
+          name, about, avatar, email, hash,
         }))
         .then((newUser) => {
           res.send(newUser);
