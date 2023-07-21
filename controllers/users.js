@@ -41,7 +41,7 @@ const createUser = (req, res, next) => {
           next(err);
         });
     })
-    .catch((next));
+    .catch((err) => next(err));
 };
 
 const getUsers = (req, res, next) => {
