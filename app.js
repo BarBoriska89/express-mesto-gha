@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
 
-const { auth } = require('./middlewares/auth');
 const { errorsMV } = require('./middlewares/errors');
 const {
   login, createUser,
@@ -22,7 +21,6 @@ app.use(bodyParser.json());
 app.post('/signin', loginValidation, login);
 app.post('/signup', createUserValidation, createUser);
 
-//app.use(auth);
 app.use(router);
 app.use(errors());
 app.use(errorsMV);
