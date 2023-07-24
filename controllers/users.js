@@ -19,20 +19,34 @@ const createUser = (req, res, next) => {
     next(new BadRequest('Переданы некорректные данные при создании пользователя.'));
     return;
   }
-  bcrypt.hash(password, SALT_ROUNDS)
-    .then((hash) => User.create({
-      name, about, avatar, email, password: hash,
-    }))
+
+  User.findOne({ email })
     .then((user) => {
-      res.send({ message: `Пользователь ${email} успешно зарегистрирован` });
-      console.log(user);
-    })
-    .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        next(new BadRequest(err.message));
+      if (user) {
+        next(new ConflictError('Пользователь с таким Email уже создан.'));
         return;
       }
-      next(err);
+      bcrypt.hash(password, SALT_ROUNDS)
+        .then((hash) => User.create({
+          name, about, avatar, email, password: hash,
+        }))
+        .then((newUser) => {
+          res.send({
+            _id: newUser._id,
+            name: newUser.name,
+            about: newUser.about,
+            avatar: newUser.avatar,
+            email: newUser.email,
+          });
+          console.log(newUser);
+        })
+        .catch((err) => {
+       //   if (err instanceof mongoose.Error.ValidationError) {
+       //     next(new BadRequest(err.message));
+       //     return;
+       //   }
+          next(err);
+        });
     });
 };
 
