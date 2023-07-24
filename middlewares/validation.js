@@ -50,7 +50,7 @@ const loginValidation = celebrate({
 const createCardValidation = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
-    link: Joi.string().pattern(regex),
+    link: Joi.string().pattern(regex).required(),
   }),
 });
 

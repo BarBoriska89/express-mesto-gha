@@ -19,29 +19,21 @@ const createUser = (req, res, next) => {
     next(new BadRequest('Переданы некорректные данные при создании пользователя.'));
     return;
   }
-
-  User.findOne({ email })
+  bcrypt.hash(password, SALT_ROUNDS)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
     .then((user) => {
-      if (user) {
-        throw new ConflictError('Пользователь с таким Email уже создан.');
-      }
-
-      return bcrypt.hash(password, SALT_ROUNDS)
-        .then((hash) => User.create({
-          name, about, avatar, email, password: hash,
-        }))
-        .then(() => {
-          res.send({ message: `Пользователь ${email} успешно зарегистрирован` });
-        })
-        .catch((err) => {
-          if (err instanceof mongoose.Error.ValidationError) {
-            next(new BadRequest(err.message));
-            return;
-          }
-          next(err);
-        });
+      res.send({ message: `Пользователь ${email} успешно зарегистрирован` });
+      console.log(user);
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        next(new BadRequest(err.message));
+        return;
+      }
+      next(err);
+    });
 };
 
 const getUsers = (req, res, next) => {
