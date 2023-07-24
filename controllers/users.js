@@ -30,9 +30,8 @@ const createUser = (req, res, next) => {
         .then((hash) => User.create({
           name, about, avatar, email, password: hash,
         }))
-        .then((newUser) => {
+        .then(() => {
           res.send({ message: `Пользователь ${email} успешно зарегистрирован` });
-          console.log(newUser);
         })
         .catch((err) => {
           if (err instanceof mongoose.Error.ValidationError) {

@@ -1,13 +1,10 @@
 {
   "env": {
-      "node": true,
+    "node": true,
     "es2021": true
   },
   "extends": [
     "airbnb-base"
-    //"eslint:recommended"
-   // "plugin:react/recommended",
-   // "plugin:react/jsx-runtime"
   ],
   "parserOptions": {
     "ecmaFeatures": {
@@ -16,8 +13,7 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": [
-    ],
+  "plugins": [],
   "rules": {
     "no-underscore-dangle": [
       "error",
