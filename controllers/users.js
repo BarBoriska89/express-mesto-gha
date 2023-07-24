@@ -41,10 +41,6 @@ const createUser = (req, res, next) => {
           console.log(newUser);
         })
         .catch((err) => {
-       //   if (err instanceof mongoose.Error.ValidationError) {
-       //     next(new BadRequest(err.message));
-       //     return;
-       //   }
           next(err);
         });
     });
