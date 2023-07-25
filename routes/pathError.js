@@ -1,7 +1,7 @@
-const NOT_FOUND = 404;
+const NotFound = require('../errors/NotFound');
 
-const pathError = (req, res) => {
-  res.status(NOT_FOUND).send({ message: 'Запросы по указанным параметрам не подлежат обработке' });
+const pathError = (req, res, next) => {
+  next(new NotFound('Запросы по указанным параметрам не подлежат обработке'));
 };
 
 module.exports = pathError;

@@ -5,7 +5,6 @@ const User = require('../models/user');
 
 const BadRequest = require('../errors/BadRequest');
 const NotFound = require('../errors/NotFound');
-const ConflictError = require('../errors/ConflictError');
 const AuthError = require('../errors/AuthError');
 
 const SALT_ROUNDS = 10;
@@ -15,35 +14,21 @@ const createUser = (req, res, next) => {
     name, about, avatar, email, password,
   } = req.body;
 
-  if (!email || !password) {
-    next(new BadRequest('Переданы некорректные данные при создании пользователя.'));
-    return;
-  }
-
-  User.findOne({ email })
-    .then((user) => {
-      if (user) {
-        next(new ConflictError('Пользователь с таким Email уже создан.'));
-        return;
-      }
-      bcrypt.hash(password, SALT_ROUNDS)
-        .then((hash) => User.create({
-          name, about, avatar, email, password: hash,
-        }))
-        .then((newUser) => {
-          res.send({
-            _id: newUser._id,
-            name: newUser.name,
-            about: newUser.about,
-            avatar: newUser.avatar,
-            email: newUser.email,
-          });
-          console.log(newUser);
-        })
-        .catch((err) => {
-          next(err);
-        });
-    });
+  bcrypt.hash(password, SALT_ROUNDS)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
+    .then((newUser) => {
+      res.send({
+        _id: newUser._id,
+        name: newUser.name,
+        about: newUser.about,
+        avatar: newUser.avatar,
+        email: newUser.email,
+      });
+      console.log(newUser);
+    })
+    .catch(next);
 };
 
 const getUsers = (req, res, next) => {
@@ -67,8 +52,9 @@ const getUser = (req, res, next) => {
       console.log(err.name);
       if (err instanceof mongoose.Error.CastError) {
         next(new BadRequest(`Пользователь по указанному _id ${userId} не найден. `));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -89,8 +75,9 @@ const updateUser = (req, res, next) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequest('Переданы некорректные данные при обновлении профиля.'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -108,17 +95,15 @@ const updateAvatar = (req, res, next) => {
       console.log(err.name);
       if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequest('Переданы некорректные данные при обновлении аватара.'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
   console.log(email, password);
-  if (!email || !password) {
-    throw new BadRequest('Введите логин и пароль пользователя.');
-  }
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
@@ -144,13 +129,7 @@ const getCurrentUser = (req, res, next) => {
       }
       res.send(user);
     })
-    .catch((err) => {
-      console.log(err.name);
-      if (err instanceof mongoose.Error.CastError) {
-        next(new BadRequest(`Пользователь по указанному _id ${userId} не найден. `));
-      }
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports = {

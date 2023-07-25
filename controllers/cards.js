@@ -15,9 +15,10 @@ const createCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        throw new BadRequest('Переданы некорректные данные при создании карточки.');
+        next(new BadRequest('Переданы некорректные данные при создании карточки.'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -27,9 +28,7 @@ const getCards = (req, res, next) => {
       console.log(cards);
       res.send(cards);
     })
-    .catch(() => {
-      next();
-    });
+    .catch(next);
 };
 
 const deleteCard = (req, res, next) => {
@@ -44,15 +43,16 @@ const deleteCard = (req, res, next) => {
       if (!card.owner.equals(req.user._id)) {
         throw new ForbiddenError('Вы не можете удалить чужую карточку.');
       }
-      Card.findByIdAndRemove(cardId)
+      Card.deleteOne(cardId)
         .then(() => { res.send({ message: 'Карточка удалена.' }); });
     })
     .catch((err) => {
       console.log(err.name);
       if (err instanceof mongoose.Error.CastError) {
         next(new BadRequest(`Карточка с указанным _id ${cardId} не найдена. `));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -73,8 +73,9 @@ const likeCard = (req, res, next) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         next(new BadRequest('Переданы некорректные данные для постановки/снятия лайка. '));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -95,8 +96,9 @@ const dislikeCard = (req, res, next) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         next(new BadRequest('Переданы некорректные данные для постановки/снятии лайка.'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 

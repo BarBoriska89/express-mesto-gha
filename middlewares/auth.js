@@ -1,10 +1,12 @@
 const jwt = require('jsonwebtoken');
+const AuthError = require('../errors/AuthError');
 
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res.status(401).send({ message: 'Необходима авторизация' });
+    next(new AuthError('Необходима авторизация'));
+    return;
   }
   const token = authorization.replace('Bearer ', '');
 
@@ -13,12 +15,12 @@ const auth = (req, res, next) => {
   try {
     payload = jwt.verify(token, 'bigsecret');
   } catch (err) {
-    return res.status(401).send({ message: 'Необходима авторизация' });
+    next(new AuthError('Необходима авторизация'));
   }
   req.user = payload;
 
   console.log('Вы авторизированы!');
-  return next();
+  next();
 };
 
 module.exports = { auth };

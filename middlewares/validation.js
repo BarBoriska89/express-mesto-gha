@@ -7,7 +7,7 @@ const regex = /^((http|https):\/\/)?(www\.)?([A-Za-z0-9]{1}[A-Za-z0-9-]*\.?)*\.{
 const createUserValidation = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().min(8).required(),
+    password: Joi.string().min(5).required(),
     name: Joi.string().min(2).max(30),
     avatar: Joi.string().pattern(regex),
     about: Joi.string().min(2).max(30),
@@ -23,7 +23,7 @@ const updateUserValidation = celebrate({
 
 const updateAvatarValidation = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().pattern(regex),
+    avatar: Joi.string().pattern(regex).required(),
   }),
 });
 
@@ -36,7 +36,7 @@ const IdValidation = (id) => {
 
 const getUserValidation = celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().custom(IdValidation),
+    userId: Joi.string().custom(IdValidation).required(),
   }),
 });
 
@@ -56,7 +56,7 @@ const createCardValidation = celebrate({
 
 const getCardValidation = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().custom(IdValidation),
+    cardId: Joi.string().custom(IdValidation).required(),
   }),
 });
 
