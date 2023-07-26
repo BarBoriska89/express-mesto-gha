@@ -6,6 +6,7 @@ const User = require('../models/user');
 const BadRequest = require('../errors/BadRequest');
 const NotFound = require('../errors/NotFound');
 const AuthError = require('../errors/AuthError');
+const ConflictError = require('../errors/ConflictError');
 
 const SALT_ROUNDS = 10;
 
@@ -14,21 +15,32 @@ const createUser = (req, res, next) => {
     name, about, avatar, email, password,
   } = req.body;
 
-  bcrypt.hash(password, SALT_ROUNDS)
-    .then((hash) => User.create({
-      name, about, avatar, email, password: hash,
-    }))
-    .then((newUser) => {
-      res.send({
-        _id: newUser._id,
-        name: newUser.name,
-        about: newUser.about,
-        avatar: newUser.avatar,
-        email: newUser.email,
-      });
-      console.log(newUser);
+  User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        next(new ConflictError('Пользователь с таким Email уже создан.'));
+        return;
+      }
+
+      bcrypt.hash(password, SALT_ROUNDS)
+        .then((hash) => User.create({
+          name, about, avatar, email, password: hash,
+        }))
+        .then((newUser) => {
+          res.send({
+            _id: newUser._id,
+            name: newUser.name,
+            about: newUser.about,
+            avatar: newUser.avatar,
+            email: newUser.email,
+          });
+          console.log(newUser);
+        })
+        .catch((err) => {
+          next(err);
+        });
     })
-    .catch(next);
+    .catch((next));
 };
 
 const getUsers = (req, res, next) => {

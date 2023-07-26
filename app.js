@@ -11,6 +11,7 @@ const router = require('./routes/index');
 const {
   createUserValidation, loginValidation,
 } = require('./middlewares/validation');
+const { auth } = require('./middlewares/auth');
 
 const app = express();
 
@@ -20,7 +21,7 @@ app.use(bodyParser.json());
 
 app.post('/signin', loginValidation, login);
 app.post('/signup', createUserValidation, createUser);
-
+app.use(auth);
 app.use(router);
 app.use(errors());
 app.use(errorsMV);

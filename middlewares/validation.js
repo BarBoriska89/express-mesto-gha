@@ -6,11 +6,11 @@ const regex = /^((http|https):\/\/)?(www\.)?([A-Za-z0-9]{1}[A-Za-z0-9-]*\.?)*\.{
 
 const createUserValidation = celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().min(5).required(),
     name: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(regex),
     about: Joi.string().min(2).max(30),
+    avatar: Joi.string().pattern(regex),
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
   }),
 });
 
