@@ -16,10 +16,10 @@ const auth = (req, res, next) => {
     payload = jwt.verify(token, 'bigsecret');
   } catch (err) {
     next(new AuthError('Необходима авторизация'));
+    return;
   }
   req.user = payload;
 
-  console.log('Вы авторизированы!');
   next();
 };
 

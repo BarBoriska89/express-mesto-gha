@@ -25,7 +25,6 @@ const createCard = (req, res, next) => {
 const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => {
-      console.log(cards);
       res.send(cards);
     })
     .catch(next);
@@ -36,18 +35,16 @@ const deleteCard = (req, res, next) => {
 
   Card.findById(cardId)
     .then((card) => {
-      console.log(card);
       if (!card) {
         throw new NotFound(`Карточка с указанным _id ${cardId} не найдена. `);
       }
       if (!card.owner.equals(req.user._id)) {
         throw new ForbiddenError('Вы не можете удалить чужую карточку.');
       }
-      Card.deleteOne(card)
+      return Card.deleteOne(card)
         .then(() => { res.send({ message: 'Карточка удалена.' }); });
     })
     .catch((err) => {
-      console.log(err.name);
       if (err instanceof mongoose.Error.CastError) {
         next(new BadRequest(`Карточка с указанным _id ${cardId} не найдена. `));
       } else {
@@ -58,7 +55,6 @@ const deleteCard = (req, res, next) => {
 
 const likeCard = (req, res, next) => {
   const { cardId } = req.params;
-  console.log(cardId);
   Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: req.user._id } },
